@@ -97,21 +97,34 @@ if selected == 'Recommended Companies':
             # st.write(df['Company Name'])
     with col2:
 
-        with st.form(key='my_form22'):
-            site = st.selectbox(
-                'The appropriate companies ', options=[site for site in df['Web Site'].values])
+        # with st.form(key='my_form22'):
+        site = st.selectbox(
+            'The appropriate companies ', options=[site for site in df['Web Site'].values])
 
-            button_site = st.form_submit_button(label='visit Web site')  # ,on_click=site_clicked
-        if button_site:  # or st.session_state.site_clicked
-            webbrowser.open_new(site)
+        # button_site = st.form_submit_button(label='visit Web site')  # ,on_click=site_clicked
+        url_site = "https://www."
+        st.markdown(f'''
+                    <a href={url_site}{site}><button style="background-color:brown;">visit Web site</button></a>
+                    ''',
+                    unsafe_allow_html=True)
+        # if button_site:  # or st.session_state.site_clicked
+        #     webbrowser.open_new_tab(site)
 
-    with st.form(key='my_form3'):
-        linkedin = st.selectbox(
-            'linekedin Profiles', options=[linkedin for linkedin in df['Linkedin'].values])
 
-        button_linkedin = st.form_submit_button(label='Visit linkedin profile')
-    if button_linkedin:
-        webbrowser.open_new(linkedin)
+
+    # with st.form(key='my_form3'):
+    linkedin = st.selectbox(
+        'linekedin Profiles', options=[linkedin for linkedin in df['Linkedin'].values])
+    url_link = "https://www."
+    st.markdown(f'''
+    <a href={url_link}{linkedin}><button style="background-color:GreenYellow;">Visit linkedin profile</button></a>
+    ''',
+                unsafe_allow_html=True)
+
+
+    #     button_linkedin = st.form_submit_button(label='Visit linkedin profile')
+    # if button_linkedin:
+    #     webbrowser.open_new(linkedin)
 
 if 'data_company' not in st.session_state:
     st.session_state.data_company = None

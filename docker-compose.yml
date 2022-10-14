@@ -1,0 +1,27 @@
+version: "3.1"
+services:
+  mongo:
+    image: mongo
+    container_name: mongo_container
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    volumes:
+      - mongo_volume:/data/db
+    ports:
+      - "27023:27017"
+
+  app:
+    build: .
+    environment:
+      - MONGODB_CONNSTRING=mongodb+srv://rhayem:test@cluster0.9elwmya.mongodb.net/?retryWrites=true&w=majority
+      - MONGO_URL=mongodb://mongo:27017
+    ports:
+      - "8501:8501"
+    depends_on:
+      - mongo
+
+volumes:
+  mongo_volume:
+

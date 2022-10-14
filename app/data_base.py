@@ -4,7 +4,13 @@ import urllib.parse
 import pandas as pd
 import sqlite3
 import streamlit as st
-
+import os
+connString = os.environ['MONGODB_CONNSTRING']
+mongo_local_url = os.environ['MONGO_URL']
+# user_root = os.environ["MONGO_INITDB_ROOT_USERNAME"]
+# pass_root = os.environ["MONGO_INITDB_ROOT_PASSWORD"]
+user_root = "root"
+pass_root = "root"
 
 def connect_base():
     # DB Management
@@ -32,13 +38,15 @@ def add_userdata(username, password):
 
 
 def connect_mongo():
-    mongo_uri = "mongodb+srv://rhayem:" + urllib.parse.quote(
-        "wweraw5W@") + "@cluster0.9elwmya.mongodb.net/?retryWrites=true&w=majority"
+    # mongo_uri = "mongodb+srv://rhayem:" + urllib.parse.quote(
+    #     "wweraw5W@") + "@cluster0.9elwmya.mongodb.net/?retryWrites=true&w=majority"
+    mongo_uri = connString
     client = pymongo.MongoClient(mongo_uri)
     return client
 
 
-@st.cache(allow_output_mutation=True)
+# @st.cache(allow_output_mutation=True)
+@st.experimental_memo(persist="disk")
 def get_company_data():
     client = connect_mongo()
     result = client['jobs_resume']['jobs'].find()
@@ -106,8 +114,11 @@ def query(country, keywords):
 
 # @st.cache(suppress_st_warning=True,persist =True)
 def local_mongo():
-    mongo_uri = "mongodb://localhost:27017"
-    client = pymongo.MongoClient(mongo_uri)
+    # mongo_uri = "mongodb://localhost:27017"
+    # mongo_uri = "mongodb://mongo:27017"
+    mongo_uri = mongo_local_url
+    # client = pymongo.MongoClient(mongo_uri)
+    client = pymongo.MongoClient(mongo_uri, username=user_root, password=pass_root)
     return client
 
 

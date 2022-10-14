@@ -1,7 +1,7 @@
 import string
 import spacy
 from keybert import KeyBERT
-from transformers import pipeline
+from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
 import pdfplumber
 from sentence_transformers import SentenceTransformer, util  # , InputExample, losses
 import os
@@ -9,17 +9,20 @@ from data_base import *
 from email.message import EmailMessage
 import ssl
 import smtplib
+import en_core_web_sm
 
-path = r"C:\Users\rhayem\AppData\Local\Programs\Python\Python39\Lib\site-packages\en_core_web_sm\en_core_web_sm-3.4.0"
-nlp = spacy.load(path)
+# path = r"C:\Users\rhayem\AppData\Local\Programs\Python\Python39\Lib\site-packages\en_core_web_sm\en_core_web_sm-3.4.0"
+# nlp = spacy.load(path)
+nlp = en_core_web_sm.load()
 
 
 # function to clean the data
 @st.cache(suppress_st_warning=True, persist=True)
 def clean_data(data):
-    path = r"C:\Users\rhayem\AppData\Local\Programs\Python\Python39\Lib\site-packages" \
-           r"\en_core_web_sm\en_core_web_sm-3.4.0"
-    nlp = spacy.load(path)
+    # path = r"C:\Users\rhayem\AppData\Local\Programs\Python\Python39\Lib\site-packages" \
+    #        r"\en_core_web_sm\en_core_web_sm-3.4.0"
+    # nlp = spacy.load(path)
+    nlp = en_core_web_sm.load()
     data = ' '.join(str(k) for k in nlp(data) if str(k) not in string.punctuation)
     # remove stop words , punct , space, and extract root words
     data = ' '.join([str(k.lemma_.lower()) for k in nlp(data) if not k.is_punct and not k.is_stop and not k.is_space
@@ -43,8 +46,13 @@ def key_words_extraction(text):
 
 @st.cache(suppress_st_warning=True)
 def summary_cover(cover):
-    summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
-    summary = summarizer(cover, max_length=200, min_length=100, do_sample=False)
+    save_directory = './saved'
+    tokenizer = AutoTokenizer.from_pretrained(save_directory)
+    model = AutoModelForSeq2SeqLM.from_pretrained(save_directory)
+    classifier = pipeline("summarization", model=model, tokenizer=tokenizer)
+    # summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+    # summary = summarizer(cover, max_length=200, min_length=100, do_sample=False)
+    summary = classifier(cover, max_length=200, min_length=100, do_sample=False)
     # max_length=100, min_length=40
     return summary[0]['summary_text']
 
@@ -135,7 +143,8 @@ def get_cover_resume_path():
     """
     return data frame contains full path for cover and resume
     """
-    cover_dir = os.path.join("C:\/Users\/rhayem\PycharmProjects\Job_Recommender\/app\condidatures")
+    # cover_dir = os.path.join("C:\/Users\/rhayem\PycharmProjects\Job_Recommender\/app\condidatures")
+    cover_dir = os.path.join("./condidatures")
     condidate_dir = os.listdir(cover_dir)  # output ['condidat0', 'condidat1', 'condidat2', 'condidat3', 'condidat4']
 
     list_cond = dict()
@@ -181,9 +190,11 @@ def summary_cover_and_resume(pathe):
 
 # @st.cache(suppress_st_warning=True,persist =True)
 def get_skills(pathe):
-    path = r"C:\Users\rhayem\AppData\Local\Programs\Python\Python39\Lib\site-packages\en_core_web_sm\en_core_web_sm-3.4.0"
-    nlp = spacy.load(path)
-    skill_pattern_path = r"C:\Users\rhayem\PycharmProjects\Job_Recommender\app\jz_skill_patterns.jsonl"
+    # path = r"C:\Users\rhayem\AppData\Local\Programs\Python\Python39\Lib\site-packages\en_core_web_sm\en_core_web_sm-3.4.0"
+    # nlp = spacy.load(path)
+    nlp = en_core_web_sm.load()
+    # skill_pattern_path = r"C:\Users\rhayem\PycharmProjects\Job_Recommender\app\jz_skill_patterns.jsonl"
+    skill_pattern_path = "./jz_skill_patterns.jsonl"
     ruler = nlp.add_pipe("entity_ruler")
     ruler.from_disk(skill_pattern_path)
 
