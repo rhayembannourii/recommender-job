@@ -46,13 +46,13 @@ def key_words_extraction(text):
 
 @st.cache(suppress_st_warning=True)
 def summary_cover(cover):
-    save_directory = './saved'
-    tokenizer = AutoTokenizer.from_pretrained(save_directory)
-    model = AutoModelForSeq2SeqLM.from_pretrained(save_directory)
-    classifier = pipeline("summarization", model=model, tokenizer=tokenizer)
-    # summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
-    # summary = summarizer(cover, max_length=200, min_length=100, do_sample=False)
-    summary = classifier(cover, max_length=200, min_length=100, do_sample=False)
+    # save_directory = './saved'
+    # tokenizer = AutoTokenizer.from_pretrained(save_directory)
+    # model = AutoModelForSeq2SeqLM.from_pretrained(save_directory)
+    # classifier = pipeline("summarization", model=model, tokenizer=tokenizer)
+    summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+    summary = summarizer(cover, max_length=200, min_length=100, do_sample=False)
+    # summary = classifier(cover, max_length=200, min_length=100, do_sample=False)
     # max_length=100, min_length=40
     return summary[0]['summary_text']
 
